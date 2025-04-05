@@ -20,7 +20,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.notification.security.JwtAuthenticationFilter;
-import com.example.notification.security.JwtUtil;
 
 import io.jsonwebtoken.security.Keys;
 
@@ -35,7 +34,7 @@ public class SecurityConfig {
 	private String jwtSecret;
 
 	private final JwtAuthenticationFilter authFilter;
-	
+
 	public SecurityConfig(JwtAuthenticationFilter authFilter) {
 		this.authFilter = authFilter;
 	}
@@ -45,8 +44,14 @@ public class SecurityConfig {
 
 		http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.authorizeHttpRequests(request -> request.requestMatchers(AUTH_WHITELIST).permitAll()
-						.requestMatchers("/auth/login").permitAll()
-						.requestMatchers("/actuator/prometheus").permitAll()
+						.requestMatchers("/auth/login").permitAll().requestMatchers("/actuator/prometheus").permitAll()
+						.requestMatchers(
+							    "/ws-notification",
+							    "/ws-notification/**",
+							    "/ws-notification/info",
+							    "/ws-notification/info/**"
+							)
+						.permitAll() //This is done for test-client html as it will fail on cors
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth -> oauth.jwt())
 				.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
@@ -66,7 +71,7 @@ public class SecurityConfig {
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
 	}
-	
+
 	@Bean
 	public JwtDecoder jwtDecoder() {
 		SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));

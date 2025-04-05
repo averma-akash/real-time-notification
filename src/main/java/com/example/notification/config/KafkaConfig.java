@@ -36,7 +36,12 @@ public class KafkaConfig {
 		config.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
 		return new DefaultKafkaProducerFactory<>(config);
 	}
-
+	
+	@Bean
+    public KafkaTemplate<String, String> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+	
 	// Consumer Configuration
 	@Bean
 	public ConsumerFactory<String, String> consumerFactory() {

@@ -47,10 +47,17 @@ management:
       show-details: always
     redis:
       enabled: true
+    prometheus:
+      enabled: true
   metrics:
     export:
       prometheus:
         enabled: true
+    enable:
+      all: true
+      jvm: true
+      http: true
+      kafka: true
   security:
     enabled: false 
 server:

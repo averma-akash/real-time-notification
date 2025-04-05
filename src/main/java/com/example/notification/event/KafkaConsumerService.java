@@ -8,6 +8,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.notification.service.RedisService;
@@ -19,10 +20,12 @@ public class KafkaConsumerService {
 
 	private final RedisService redisService;
 	private final KafkaTemplate<String, String> kafkaTemplate;
+	private final SimpMessagingTemplate messagingTemplate;
 
-	public KafkaConsumerService(RedisService redisService, KafkaTemplate<String, String> kafkaTemplate) {
+	public KafkaConsumerService(RedisService redisService, KafkaTemplate<String, String> kafkaTemplate, SimpMessagingTemplate messagingTemplate) {
 		this.redisService = redisService;
 		this.kafkaTemplate = kafkaTemplate;
+		this.messagingTemplate = messagingTemplate;
 	}
 
 	@KafkaListener(topics = "notification-events", groupId = "notification-group")
@@ -56,7 +59,8 @@ public class KafkaConsumerService {
 		try {
 			logger.info("[MAIN] Received: {}", record.value());
 
-			// Add your business logic here (this is simulated)
+			// Broadcast to WebSocket clients
+			messagingTemplate.convertAndSend("/topic/notifications", record.value());
 			throw new RuntimeException("Simulated failure in main consumer");
 
 		} catch (Exception ex) {
