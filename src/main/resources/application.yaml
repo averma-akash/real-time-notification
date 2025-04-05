@@ -8,7 +8,7 @@ spring:
   active: dev
  data:
   redis:
-   host: localhost #redis-container
+   host: redis-container-notification #redis-container
    port: 6379
 
 url:
