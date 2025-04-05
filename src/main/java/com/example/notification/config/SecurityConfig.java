@@ -45,7 +45,9 @@ public class SecurityConfig {
 
 		http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.authorizeHttpRequests(request -> request.requestMatchers(AUTH_WHITELIST).permitAll()
-						.requestMatchers("/auth/login").permitAll().anyRequest().authenticated())
+						.requestMatchers("/auth/login").permitAll()
+						.requestMatchers("/actuator/prometheus").permitAll()
+						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth -> oauth.jwt())
 				.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
